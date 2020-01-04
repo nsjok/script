@@ -277,7 +277,7 @@ EOF
 	green "1、复制下面的链接，在浏览器打开，下载客户端"
 	blue "http://${your_domain}/$trojan_path/trojan-cli.zip"
 	green "2、将下载的压缩包解压，打开文件夹，打开start.bat即打开并运行Trojan客户端"
-	green "3、打开stop.bat即关闭Trojan客户端"
+	green "3、打开stop.bat即关闭Trojan客户端  ${your_domain} 端口为 443  密码为 ${trojan_passwd} "
 	green "4、Trojan客户端需要搭配浏览器插件使用，例如switchyomega等"
 	green "======================================================================"
 	else
