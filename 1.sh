@@ -167,7 +167,13 @@ EOF
 	wget https://github.com/atrandys/trojan/raw/master/trojan-cli.zip
 	unzip trojan-cli.zip
 	cp /usr/src/trojan-cert/fullchain.cer /usr/src/trojan-cli/fullchain.cer
-	trojan_passwd=$(cat /dev/urandom | head -1 | md5sum | head -c 8)
+	read -p "(初始密码为: www.freevpnnet.com):" shadowsockspwd
+        [ -z "${trojan_passwd}" ] && trojan_passwd="www.freevpnnet.com"
+        echo
+        echo "---------------------------"
+        echo "密码为 = ${trojan_passwd}"
+        echo "---------------------------"
+        echo
 	cat > /usr/src/trojan-cli/config.json <<-EOF
 {
     "run_type": "client",
