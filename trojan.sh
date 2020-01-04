@@ -1,3 +1,25 @@
+Skip to content
+ 
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@xiaohouzivpn 
+Learn Git and GitHub without any code!
+Using the Hello World guide, you’ll start a branch, write comments, and open a pull request.
+
+ 
+1
+0 0 xiaohouzivpn/script
+ Code  Issues 0  Pull requests 0  Actions  Projects 0  Wiki  Security  Insights  Settings
+script/trojan.sh
+@xiaohouzivpn xiaohouzivpn Create trojan.sh
+c2ee91e 9 minutes ago
+349 lines (340 sloc)  10.5 KB
+    
 #!/bin/bash
 
 blue(){
@@ -167,7 +189,14 @@ EOF
 	wget https://github.com/atrandys/trojan/raw/master/trojan-cli.zip
 	unzip trojan-cli.zip
 	cp /usr/src/trojan-cert/fullchain.cer /usr/src/trojan-cli/fullchain.cer
-	trojan_passwd=$(cat /dev/urandom | head -1 | md5sum | head -c 8)
+	read -p "(初始密码为: www.freevpnnet.com):" shadowsockspwd
+    [ -z "${trojan_passwd}" ] && trojan_passwd="www.freevpnnet.com"
+    echo
+    echo "---------------------------"
+    echo "密码为 = ${trojan_passwd}"
+    echo "---------------------------"
+    echo
+	# trojan_passwd=$(cat /dev/urandom | head -1 | md5sum | head -c 8)
 	cat > /usr/src/trojan-cli/config.json <<-EOF
 {
     "run_type": "client",
@@ -277,7 +306,7 @@ EOF
 	green "1、复制下面的链接，在浏览器打开，下载客户端"
 	blue "http://${your_domain}/$trojan_path/trojan-cli.zip"
 	green "2、将下载的压缩包解压，打开文件夹，打开start.bat即打开并运行Trojan客户端"
-	green "3、打开stop.bat即关闭Trojan客户端"
+	green "3、打开stop.bat即关闭Trojan客户端 地址为 ${your_domain} 端口为 443  密码为 ${trojan_passwd}  "
 	green "4、Trojan客户端需要搭配浏览器插件使用，例如switchyomega等"
 	green "======================================================================"
 	else
@@ -347,3 +376,15 @@ start_menu(){
 }
 
 start_menu
+© 2020 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
