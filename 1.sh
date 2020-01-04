@@ -40,6 +40,10 @@ elif cat /proc/version | grep -Eqi "centos|red hat|redhat"; then
     systempwd="/usr/lib/systemd/system/"
 fi
 
+check_root(){
+	[[ $EUID != 0 ]] && echo -e "${Error} 当前账号非ROOT(或没有ROOT权限)，无法继续操作，请使用${Green_background_prefix} sudo su ${Font_color_suffix}来获取临时ROOT权限（执行后会提示输入当前账号的密码）。" && exit 1
+}
+
 function install_trojan(){
 CHECK=$(grep SELINUX= /etc/selinux/config | grep -v "#")
 if [ "$CHECK" == "SELINUX=enforcing" ]; then
@@ -300,6 +304,107 @@ else
 fi
 }
 
+
+Other_functions(){
+	echo && echo -e "  你要做什么？
+	
+  ${Green_font_prefix}1.${Font_color_suffix} 配置 BBR
+  ${Green_font_prefix}2.${Font_color_suffix} 配置 锐速(ServerSpeeder)
+  ${Green_font_prefix}3.${Font_color_suffix} 配置 LotServer(锐速母公司)
+  注意： 锐速/LotServer/BBR 不支持 OpenVZ！
+  注意： 锐速/LotServer/BBR 不能共存！
+————————————
+  ${Green_font_prefix}4.${Font_color_suffix} 一键封禁 BT/PT/SPAM (iptables)
+  ${Green_font_prefix}5.${Font_color_suffix} 一键解封 BT/PT/SPAM (iptables)
+  ${Green_font_prefix}6.${Font_color_suffix} 切换 ShadowsocksR日志输出模式
+  ——说明：SSR默认只输出错误日志，此项可切换为输出详细的访问日志" && echo
+	read -e -p "(默认: 取消):" other_num
+	[[ -z "${other_num}" ]] && echo "已取消..." && exit 1
+	if [[ ${other_num} == "1" ]]; then
+		Configure_BBR
+	elif [[ ${other_num} == "2" ]]; then
+		Configure_Server_Speeder
+	elif [[ ${other_num} == "3" ]]; then
+		Configure_LotServer
+	elif [[ ${other_num} == "4" ]]; then
+		BanBTPTSPAM
+	elif [[ ${other_num} == "5" ]]; then
+		UnBanBTPTSPAM
+	elif [[ ${other_num} == "6" ]]; then
+		Set_config_connect_verbose_info
+	else
+		echo -e "${Error} 请输入正确的数字 [1-6]" && exit 1
+	fi
+}
+# 封禁 BT PT SPAM
+BanBTPTSPAM(){
+	wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ban_iptables.sh && chmod +x ban_iptables.sh && bash ban_iptables.sh banall
+	rm -rf ban_iptables.sh
+}
+# 解封 BT PT SPAM
+UnBanBTPTSPAM(){
+	wget -N --no-check-certificate https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ban_iptables.sh && chmod +x ban_iptables.sh && bash ban_iptables.sh unbanall
+	rm -rf ban_iptables.sh
+}
+Set_config_connect_verbose_info(){
+	SSR_installation_status
+	Get_User
+	if [[ ${connect_verbose_info} = "0" ]]; then
+		echo && echo -e "当前日志模式: ${Green_font_prefix}简单模式（只输出错误日志）${Font_color_suffix}" && echo
+		echo -e "确定要切换为 ${Green_font_prefix}详细模式（输出详细连接日志+错误日志）${Font_color_suffix}？[y/N]"
+		read -e -p "(默认: n):" connect_verbose_info_ny
+		[[ -z "${connect_verbose_info_ny}" ]] && connect_verbose_info_ny="n"
+		if [[ ${connect_verbose_info_ny} == [Yy] ]]; then
+			ssr_connect_verbose_info="1"
+			Modify_config_connect_verbose_info
+			Restart_SSR
+		else
+			echo && echo "	已取消..." && echo
+		fi
+	else
+		echo && echo -e "当前日志模式: ${Green_font_prefix}详细模式（输出详细连接日志+错误日志）${Font_color_suffix}" && echo
+		echo -e "确定要切换为 ${Green_font_prefix}简单模式（只输出错误日志）${Font_color_suffix}？[y/N]"
+		read -e -p "(默认: n):" connect_verbose_info_ny
+		[[ -z "${connect_verbose_info_ny}" ]] && connect_verbose_info_ny="n"
+		if [[ ${connect_verbose_info_ny} == [Yy] ]]; then
+			ssr_connect_verbose_info="0"
+			Modify_config_connect_verbose_info
+			Restart_SSR
+		else
+			echo && echo "	已取消..." && echo
+		fi
+	fi
+}
+Update_Shell(){
+	sh_new_ver=$(wget --no-check-certificate -qO- -t1 -T3 "https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ssr.sh"|grep 'sh_ver="'|awk -F "=" '{print $NF}'|sed 's/\"//g'|head -1) && sh_new_type="github"
+	[[ -z ${sh_new_ver} ]] && echo -e "${Error} 无法链接到 Github !" && exit 0
+	if [[ -e "/etc/init.d/ssr" ]]; then
+		rm -rf /etc/init.d/ssr
+		Service_SSR
+	fi
+	wget -N --no-check-certificate "https://raw.githubusercontent.com/ToyoDAdoubi/doubi/master/ssr.sh" && chmod +x ssr.sh
+	echo -e "脚本已更新为最新版本[ ${sh_new_ver} ] !(注意：因为更新方式为直接覆盖当前运行的脚本，所以可能下面会提示一些报错，无视即可)" && exit 0
+}
+# 显示 菜单状态
+menu_status(){
+	if [[ -e ${config_user_file} ]]; then
+		check_pid
+		if [[ ! -z "${PID}" ]]; then
+			echo -e " 当前状态: ${Green_font_prefix}已安装${Font_color_suffix} 并 ${Green_font_prefix}已启动${Font_color_suffix}"
+		else
+			echo -e " 当前状态: ${Green_font_prefix}已安装${Font_color_suffix} 但 ${Red_font_prefix}未启动${Font_color_suffix}"
+		fi
+		now_mode=$(cat "${config_user_file}"|grep '"port_password"')
+		if [[ -z "${now_mode}" ]]; then
+			echo -e " 当前模式: ${Green_font_prefix}单端口${Font_color_suffix}"
+		else
+			echo -e " 当前模式: ${Green_font_prefix}多端口${Font_color_suffix}"
+		fi
+	else
+		echo -e " 当前状态: ${Red_font_prefix}未安装${Font_color_suffix}"
+	fi
+}
+
 function remove_trojan(){
     red "================================"
     red "即将卸载trojan"
@@ -330,6 +435,7 @@ start_menu(){
     echo
     green " 1. 安装trojan"
     red " 2. 卸载trojan"
+    green "3. 安装加速器"
     blue " 0. 退出脚本"
     echo
     read -p "请输入数字:" num
@@ -339,7 +445,12 @@ start_menu(){
     ;;
     2)
     remove_trojan 
+    ;; 
+    3)
+    Other_functions 
     ;;
+    
+    
     0)
     exit 1
     ;;
@@ -353,3 +464,4 @@ start_menu(){
 }
 
 start_menu
+
