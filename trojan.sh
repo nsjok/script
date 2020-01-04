@@ -1,24 +1,4 @@
-Skip to content
- 
-Search or jump to…
 
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@xiaohouzivpn 
-Learn Git and GitHub without any code!
-Using the Hello World guide, you’ll start a branch, write comments, and open a pull request.
-
- 
-1
-0 0 xiaohouzivpn/script
- Code  Issues 0  Pull requests 0  Actions  Projects 0  Wiki  Security  Insights  Settings
-script/trojan.sh
-@xiaohouzivpn xiaohouzivpn Create trojan.sh
-c2ee91e 9 minutes ago
-349 lines (340 sloc)  10.5 KB
     
 #!/bin/bash
 
