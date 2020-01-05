@@ -276,8 +276,8 @@ EOF
 	trojan_path=$(cat /dev/urandom | head -1 | md5sum | head -c 16)
 	mkdir /usr/share/nginx/html/${trojan_path}
 	mv /usr/src/trojan-cli/trojan-cli.zip /usr/share/nginx/html/${trojan_path}/
-	mv /usr/src/trojan-cli/v2rayN-win-with-trojan-v2.zip /usr/share/nginx/html/${trojan_path}/
-  mv /usr/src/trojan-cli/igniter-0.1.0-pre-alpha10.apk /usr/share/nginx/html/${trojan_path}/
+	mv /usr/src/v2rayN-win-with-trojan-v2.zip /usr/share/nginx/html/${trojan_path}/
+        mv /usr/src/igniter-0.1.0-pre-alpha10.apk /usr/share/nginx/html/${trojan_path}/
 	#增加启动脚本
 cat > ${systempwd}trojan.service <<-EOF
 [Unit]  
@@ -309,9 +309,9 @@ EOF
         blue "http://${your_domain}/$trojan_path/igniter-0.1.0-pre-alpha10.apk"
         green "IOS IPAD shadowsockR 小火箭支持 trojan"
 	green "------------------------trojan配置信息如下-----------------------------"
-        green "您的域名 （your_ domain） ：  ${your_domain}"
-        green "端口   （your_ port）          ：  443  "
-        green "密码       (your_passwd)         ：$trojan_passwd   "
+        green "您的域名 （your_ domain）     ：  ${your_domain}"
+        green "端口   （your_ port）        ： 443  "
+        green "密码       (your_passwd)     ：$trojan_passwd   "
 	green "======================================================================"
 	else
         red "================================"
