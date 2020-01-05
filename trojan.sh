@@ -362,8 +362,6 @@ start_menu(){
     2)
     remove_trojan 
     ;;
-    
-    ;;
     0)
     exit 1
     ;;
