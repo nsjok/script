@@ -356,7 +356,7 @@ start_menu(){
     green " *免费V2RAY SSR trojan  节点网站 www.freevpnnet.com      "
     green " *   原作者astrony  trojan                                      "
     green " *  如果你想使用CDN 请先关闭CDN后在运行脚本                                     "
-    green " *  cloudflare CDN 请先把  那个小云朵点灰色，安装成功后再点成橘红色就可以啦 ：）））                                  "
+    green " *  cloudflare CDN 请先把那个小云朵点成灰色，安装成功后再点成橘红色就可以啦 ：）））                                  "
     green " ************************************************"
     echo
     green " 1. 一键安装trojan"
