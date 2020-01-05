@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+#!/bin/bash
 
 blue(){
     echo -e "\033[34m\033[01m$1\033[0m"
@@ -11,6 +9,14 @@ green(){
 red(){
     echo -e "\033[31m\033[01m$1\033[0m"
 }
+
+#prepare install trojan
+Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Font_color_suffix="\033[0m"
+Info="${Green_font_prefix}[信息]${Font_color_suffix}"
+Error="${Red_font_prefix}[错误]${Font_color_suffix}"
+Tip="${Green_font_prefix}[注意]${Font_color_suffix}"
+Separator_1="——————————————————————————————"
+
 #copy from 秋水逸冰 ss scripts
 if [[ -f /etc/redhat-release ]]; then
     release="centos"
@@ -42,7 +48,14 @@ elif cat /proc/version | grep -Eqi "centos|red hat|redhat"; then
     systempwd="/usr/lib/systemd/system/"
 fi
 
+
+
 function install_trojan(){
+# root 权限检查
+check_root(){
+	[[ $EUID != 0 ]] && echo -e "${Error} 当前账号非ROOT(或没有ROOT权限)，无法继续操作，请使用${Green_background_prefix} sudo su ${Font_color_suffix}来获取临时ROOT权限（执行后会提示输入当前账号的密码）。" && exit 1
+}
+check_root
 CHECK=$(grep SELINUX= /etc/selinux/config | grep -v "#")
 if [ "$CHECK" == "SELINUX=enforcing" ]; then
     red "======================================================================="
@@ -169,14 +182,16 @@ EOF
 	wget https://github.com/atrandys/trojan/raw/master/trojan-cli.zip
 	unzip trojan-cli.zip
 	cp /usr/src/trojan-cert/fullchain.cer /usr/src/trojan-cli/fullchain.cer
-	read -p "(初始密码为: www.freevpnnet.com):" shadowsockspwd
-    [ -z "${trojan_passwd}" ] && trojan_passwd="www.freevpnnet.com"
-    echo
-    echo "---------------------------"
-    echo "密码为 = ${trojan_passwd}"
-    echo "---------------------------"
-    echo
-	# trojan_passwd=$(cat /dev/urandom | head -1 | md5sum | head -c 8)
+
+
+	#  trojan_passwd=$(cat /dev/urandom | head -1 | md5sum | head -c 8)
+                Set_config_password(){
+	echo "请输入trojan的密码"
+	read -e -p "(默认: www.freevpnnet.com):" trojan_passwd
+	[[ -z "${trojan_passwd}" ]] && ssr_password="www.freevpnnet.com"
+	echo && echo ${Separator_1} && echo -e "	密码 : ${Green_font_prefix}${trojan_passwd}${Font_color_suffix}" && echo ${Separator_1} && echo
+}  
+                 Set_config_password
 	cat > /usr/src/trojan-cli/config.json <<-EOF
 {
     "run_type": "client",
@@ -285,9 +300,9 @@ EOF
 	green "Trojan已安装完成，请使用以下链接下载trojan客户端，此客户端已配置好所有参数"
 	green "1、复制下面的链接，在浏览器打开，下载客户端"
 	blue "http://${your_domain}/$trojan_path/trojan-cli.zip"
-	green "2、将下载的压缩包解压，打开文件夹，打开start.bat即打开并运行Trojan客户端"
-	green "3、打开stop.bat即关闭Trojan客户端 地址为 ${your_domain} 端口为 443  密码为 ${trojan_passwd}  "
-	green "4、Trojan客户端需要搭配浏览器插件使用，例如switchyomega等"
+  green "您的域名为   ${your_domain}"
+  green "端口为  ：  443  "
+  green "密码为  $trojan_passwd ：  "
 	green "======================================================================"
 	else
         red "================================"
@@ -322,17 +337,21 @@ function remove_trojan(){
     green "trojan删除完毕"
     green "=============="
 }
+
+
 start_menu(){
     clear
-    green " ===================================="
-    green " 介绍：一键安装trojan      "
-    green " 系统：centos7+/debian9+/ubuntu16.04+"
-    green " 网站：www.atrandys.com              "
-    green " Youtube：Randy's 堡垒                "
-    green " ===================================="
+    green " ************************************************"
+    green " *介绍：一键安装trojan 脚本                                  "
+    green " *系统：centos7+/debian9+/ubuntu16.04+        "
+    green " *网站：www.freevpnnet.com  有免费的 trojan配置信息                              "
+    green " *  原作 antroy                                                                           "
+    green " ************************************************"
     echo
     green " 1. 安装trojan"
+    
     red " 2. 卸载trojan"
+  
     blue " 0. 退出脚本"
     echo
     read -p "请输入数字:" num
@@ -342,6 +361,8 @@ start_menu(){
     ;;
     2)
     remove_trojan 
+    ;;
+    
     ;;
     0)
     exit 1
@@ -356,4 +377,3 @@ start_menu(){
 }
 
 start_menu
-
