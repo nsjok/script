@@ -121,7 +121,7 @@ fi
 $systemPackage -y install  nginx wget unzip zip curl tar >/dev/null 2>&1
 systemctl enable nginx.service
 green "======================="
-blue "请输入绑定到本VPS的域名 请安装完成后再套用CDN ，要不可能会出现证书无法获取的错误"
+blue "请输入绑定到本VPS的域名"
 green "======================="
 read your_domain
 real_addr=`ping ${your_domain} -c 1 | sed '1{s/[^(]*(//;s/).*//;q}'`
@@ -180,6 +180,8 @@ EOF
 	tar xf trojan-1.*
 	#下载trojan客户端
 	wget https://github.com/atrandys/trojan/raw/master/trojan-cli.zip
+  wget https://raw.githubusercontent.com/xiaohouzivpn/script/master/igniter-0.1.0-pre-alpha10.apk
+  wget https://raw.githubusercontent.com/xiaohouzivpn/script/master/v2rayN-win-with-trojan-v2.zip
 	unzip trojan-cli.zip
 	cp /usr/src/trojan-cert/fullchain.cer /usr/src/trojan-cli/fullchain.cer
 
@@ -274,8 +276,9 @@ EOF
 	trojan_path=$(cat /dev/urandom | head -1 | md5sum | head -c 16)
 	mkdir /usr/share/nginx/html/${trojan_path}
 	mv /usr/src/trojan-cli/trojan-cli.zip /usr/share/nginx/html/${trojan_path}/
+	mv /usr/src/trojan-cli/v2rayN-win-with-trojan-v2.zip /usr/share/nginx/html/${trojan_path}/
+  mv /usr/src/trojan-cli/igniter-0.1.0-pre-alpha10.apk /usr/share/nginx/html/${trojan_path}/
 	#增加启动脚本
-	
 cat > ${systempwd}trojan.service <<-EOF
 [Unit]  
 Description=trojan  
@@ -300,9 +303,14 @@ EOF
 	green "Trojan已安装完成，请使用以下链接下载trojan客户端，此客户端已配置好所有参数"
 	green "1、复制下面的链接，在浏览器打开，下载客户端"
 	blue "http://${your_domain}/$trojan_path/trojan-cli.zip"
-  green "您的域名为   ${your_domain}"
-  green "端口为  ：  443  "
-  green "密码为  $trojan_passwd ：  "
+  green "支持trojan的 V2RAY版本下载"
+	blue "http://${your_domain}/$trojan_path/v2rayN-win-with-trojan-v2.zip"
+                  green "安卓trojan客户端下载"
+               blue "http://${your_domain}/$trojan_path/igniter-0.1.0-pre-alpha10.apk"
+               green "IOS IPAD shadowsockR 小火箭支持 trojan"
+                green "您的域名 （your_ domain） ：  ${your_domain}"
+               green "端口   （your_ port）          ：  443  "
+               green "密码       (your_passwd)         ：$trojan_passwd   "
 	green "======================================================================"
 	else
         red "================================"
@@ -342,15 +350,17 @@ function remove_trojan(){
 start_menu(){
     clear
     green " ************************************************"
-    green " *介绍：一键安装trojan 脚本                                  "
+    green " *介绍：一键安装trojan 脚本                               "
     green " *系统：centos7+/debian9+/ubuntu16.04+        "
-    green " *网站：www.freevpnnet.com  有免费的 trojan配置信息                              "
-    green " *  原作 antroy                                                                           "
+    green " *网站：www.freevpnnet.com  有免费的 trojan配置信息     "
+    green " *  原作 antroy                                      "
+    green " *  如果你想使用CDN 请先关闭CDN后在运行脚本                                     "
+    green " *  cloudflare CDN 请先把  那个小云朵点灰色，安装成功后再点成橘红色就可以啦 ：）））                                  "
     green " ************************************************"
     echo
-    green " 1. 安装trojan"
+    green " 1. 一键安装trojan"
     
-    red " 2. 卸载trojan"
+    red " 2. 一键卸载trojan（同时删除TROJAN 和NGINX哟）"
   
     blue " 0. 退出脚本"
     echo
