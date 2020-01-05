@@ -121,7 +121,7 @@ fi
 $systemPackage -y install  nginx wget unzip zip curl tar >/dev/null 2>&1
 systemctl enable nginx.service
 green "======================="
-blue "请输入绑定到本VPS的域名"
+blue "请输入绑定到本VPS的域名 请安装完成后再套用CDN ，要不可能会出现证书无法获取的错误"
 green "======================="
 read your_domain
 real_addr=`ping ${your_domain} -c 1 | sed '1{s/[^(]*(//;s/).*//;q}'`
