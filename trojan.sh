@@ -300,22 +300,22 @@ EOF
 	systemctl start trojan.service
 	systemctl enable trojan.service
 	green "======================================================================"
-	green "Trojan已安装完成，请使用以下链接下载trojan客户端，此客户端已配置好所有参数"
-	green "1、复制下面的链接，在浏览器打开，下载客户端"
+	green "恭喜您trojan安装完成"
+	green "1、原版trojan复制下面的链接，在浏览器打开，下载客户端 需要配合sstap 等socks5 配置复杂"
 	blue "http://${your_domain}/$trojan_path/trojan-cli.zip"
-  green "支持trojan的 V2RAY版本下载"
+        green "支持trojan的 V2RAY  win版本下载-----（推荐使用）"
 	blue "http://${your_domain}/$trojan_path/v2rayN-win-with-trojan-v2.zip"
         green "安卓trojan客户端下载"
         blue "http://${your_domain}/$trojan_path/igniter-0.1.0-pre-alpha10.apk"
         green "IOS IPAD shadowsockR 小火箭支持 trojan"
 	green "------------------------trojan配置信息如下-----------------------------"
-        green "您的域名 （your_ domain）     ：  ${your_domain}"
-        green "端口   （your_ port）        ： 443  "
-        green "密码       (your_passwd)     ：$trojan_passwd   "
+        green "您的域名（your_ domain）  ：  ${your_domain}"
+        green "端口 （your_ port）       ：443  "
+        green "密码 (your_passwd)       ：$trojan_passwd   "
 	green "======================================================================"
 	else
         red "================================"
-	red "https证书没有申请成果，本次安装失败"
+	red "https证书没有申请成果，本次安装失败，或许换个二级域名又可以了呢（注意先别套用CDN）"
 	red "================================"
 	fi
 	
