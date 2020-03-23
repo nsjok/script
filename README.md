@@ -14,3 +14,6 @@
     
 ## 一键搭建V2RAY后端——docker ##    
     docker run -d --name=iiaohouziv2ray -e  node_id=565 -e   usemysql=1 -e MYSQLHOST=数据库地址 -e MYSQLDBNAME="数据库名称" -e MYSQLUSR="数据库用户名" -e MYSQLPASSWD="数据库密码" -e MYSQLPORT=3306 -e CF_Key=CF的key -e CF_Email=邮箱  --restart=always --network=host --log-opt max-size=10m --log-opt max-file=3 menmanyu/xiaohouzissr:v2ray
+
+## check ip route ## 
+    wget --no-check-certificate https://raw.githubusercontent.com/xiaohouzivpn/script/master/besttrace  chmod +x besttrace &&./besttrace
